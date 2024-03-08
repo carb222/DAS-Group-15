@@ -6,6 +6,7 @@ editor: visual
 
 ## DAS Group 15
 
+
 ### Libraries
 
 Libraries to be used during project
@@ -28,3 +29,4 @@ data = read.csv("dataset15.csv")
 clean_data <- na.omit(data)
 head(clean_data)
 ```
+
