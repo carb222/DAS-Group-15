@@ -111,3 +111,9 @@ ggplot(data15,aes(x=harvested,group=Qualityclass,fill=Qualityclass))+geom_bar()
 ```{r}
 ggplot(data15,aes(x=country_of_origin,group=Qualityclass,fill=Qualityclass))+geom_bar()
 ```
+```{r}
+data15<-data15%>%
+  dplyr::select(-country_of_origin,-harvested)
+columns_to_show <- c(1, 2, 3,4,5)
+ggpairs(data15,columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
+```
