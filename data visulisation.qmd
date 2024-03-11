@@ -33,15 +33,6 @@ tbl2<-gt(selected_data2)
 tbl2
 ```
 
-Eliminate "0" in aroma, flavor and acidity.
-
-```{r}
-data15 <- data15 %>% 
-  filter(aroma != 0)%>%
-  filter(flavor != 0)%>%
-  filter(acidity != 0)
-
-```
 
 According to the figure above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity.
 
