@@ -186,4 +186,39 @@ abline(h = min(aic_df$AIC), col = "red", lwd = 2, lty = 2)
 
 ```
 
-Clearly by the plot, the two models with best performance according to AIC are the stepwise model and the model that contain all the variables. In this case, we selected the stepwise model as the best as it contains the lowest AIC and also removes 2 variables, which makes our model simpler.
+Clearly by the plot, the two models with best performance according to AIC are the stepwise model and the model that contain all the variables. In this case, we selected the stepwise model as the best as it contains the lowest AIC and also removes 2 variables, which makes our model simpler. Then consider the CI and p-value of the stepwise model
+
+```{r}
+# find out the parameters with 0 in CI
+conf_intervals <- confint(stepwise_model)
+na_vars <- names(which(apply(is.na(conf_intervals), 1, any)))
+non_significant_vars_with_na <- c(na_vars, names(which(conf_intervals[, 1] <= 0 & conf_intervals[, 2] >= 0 & !is.na(conf_intervals[, 1]) & !is.na(conf_intervals[, 2]))))
+print(non_significant_vars)
+
+#find ou the parameters p-value>0.05
+model_summary<-summary(stepwise_model)
+non_significant_vars <- names(which(model_summary$coefficients[, 4] > alpha))
+print(non_significant_vars_1)
+```
+Eliminate the category_two_defect
+
+```{r}
+new_model <- update(stepwise_model, . ~ . - `category_two_defects`)
+summary(new_model)
+aic_list$model_delete_1<- AIC(new_model)
+
+```
+```{r}
+new_model_2<- update(stepwise_model, . ~ . - `category_two_defects`-`country_of_origin`)
+summary(new_model_2)
+aic_list$model_delete_2<- AIC(new_model_2)
+
+```
+```{r}
+aic_df <- data.frame(Model = names(aic_list), AIC = as.numeric(aic_list))
+aic_df <- aic_df[order(aic_df$AIC), ]
+aic_df
+```
+
+
+
