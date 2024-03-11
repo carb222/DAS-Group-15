@@ -193,11 +193,12 @@ Clearly by the plot, the two models with best performance according to AIC are t
 conf_intervals <- confint(stepwise_model)
 na_vars <- names(which(apply(is.na(conf_intervals), 1, any)))
 non_significant_vars_with_na <- c(na_vars, names(which(conf_intervals[, 1] <= 0 & conf_intervals[, 2] >= 0 & !is.na(conf_intervals[, 1]) & !is.na(conf_intervals[, 2]))))
-print(non_significant_vars)
+print(non_significant_vars_with_na)
 
 #find ou the parameters p-value>0.05
+alpha<-0.05
 model_summary<-summary(stepwise_model)
-non_significant_vars <- names(which(model_summary$coefficients[, 4] > alpha))
+non_significant_vars_1 <- names(which(model_summary$coefficients[, 4] > alpha))
 print(non_significant_vars_1)
 ```
 Eliminate the category_two_defect
