@@ -18,17 +18,25 @@ library(GGally)
 ```
 
 ```{r}
+# Read data from "dataset15.csv" file and store it in the data15 variable
 data15<-read.csv("dataset15.csv") %>%
+  # Remove rows with missing values
   na.omit()
+# Summarize data15 and store it in the skim variable
 skim<-data15%>%
   skim()
+# Select data from skim variable, rows 1 to 2, columns 1 to 9, and store it in selected_data variable
 selected_data <- skim[1:2, 1:9]
+# Display selected_data in table format and store it in tbl1 variable
 tbl1<-gt(selected_data)
 tbl1
+skim
 ```
 
 ```{r}
+#Select rows 3 to 8('aroma' to 'harvested') and columns 2, 10 to 16(mean,sd,percentiles) from 'skim' and store in 'selected_data2'
 selected_data2<-skim[3:8,c(2,10:16)]
+#Convert 'selected_data2' to a table using 'gt' and store in 'tbl2'
 tbl2<-gt(selected_data2)
 tbl2
 ```
@@ -36,6 +44,7 @@ tbl2
 Eliminate "0" in aroma, flavor and acidity.
 
 ```{r}
+#Eliminate "0" in aroma, flavor and acidity.
 data15 <- data15 %>% 
   filter(aroma != 0)%>%
   filter(flavor != 0)%>%
@@ -46,6 +55,7 @@ data15 <- data15 %>%
 According to the figure above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity.
 
 ```{r}
+#Remove entries in 'data15' where 'altitude_mean_meters' is greater than 9000
 data15<-data15 %>%
   filter(altitude_mean_meters<= 9000)
 ```
@@ -53,14 +63,18 @@ data15<-data15 %>%
 Summary the data again:
 
 ```{r}
+#tbl3 is the summary of character variable after eliminate unreal value in altitudes and 0 in aroma flavor and acidity
+#Summarize the updated 'data15' using 'skim' and store in 'skim2'
 skim2<-data15%>%
   skim()
 selected_data3 <- skim2[1:2, 1:9]
+#Convert 'selected_data3' to a table using 'gt' and store in 'tbl3'
 tbl3<-gt(selected_data3)
 tbl3
 ```
 
 ```{r}
+#Tbl4 is the numeric variable after doing this change
 selected_data4<-skim2[3:8,c(2,10:16)]
 tbl4<-gt(selected_data4)
 tbl4
@@ -69,28 +83,35 @@ tbl4
 Doing a boxplot of aroma and quality class for the data set to find the relationship between them and test any outlier
 
 ```{r}
-ggplot(data = data15, aes(x = Qualityclass, y = aroma, fill = Qualityclass)) +
+#Boxplot
+# Create a boxplot of 'aroma' by 'Qualityclass'
+g1 <- ggplot(data = data15, aes(x = Qualityclass, y = aroma, fill = Qualityclass)) +
   geom_boxplot() +
-  labs(x = "Qualityclass", y = "aroma")
-```
-
-```{r}
-
-ggplot(data = data15, aes(x = Qualityclass, y = flavor, fill = Qualityclass)) +
+  labs(x = "Qualityclass", y = "aroma") +
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 1) # Ensuring the plot is square
+# Create a boxplot of 'flavor' by 'Qualityclass' without a legend
+g2 <- ggplot(data = data15, aes(x = Qualityclass, y = flavor, fill = Qualityclass)) +
   geom_boxplot() +
-  labs(x = "Qualityclass", y = "flavor")+ 
-  theme(legend.position = "none")
-```
-
-```{r}
-ggplot(data = data15, aes(x = Qualityclass, y = acidity, fill = Qualityclass)) +
+  labs(x = "Qualityclass", y = "flavor") + 
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 1) # Ensuring the plot is square
+# Create a boxplot of 'acidity' by 'Qualityclass' without a legend
+g3 <- ggplot(data = data15, aes(x = Qualityclass, y = acidity, fill = Qualityclass)) +
   geom_boxplot() +
-  labs(x = "Qualityclass", y = "acidity")+ 
-  theme(legend.position = "none")
+  labs(x = "Qualityclass", y = "acidity") + 
+  theme(legend.position = "none") +
+  coord_fixed(ratio = 1) # Ensuring the plot is square
 
+# Arrange the plots in one row with three columns
+g <- grid.arrange(g1, g2, g3, ncol=3)
+ggsave("my_plots.png", g, width = 10, height = 10, units = "cm")
 ```
+In summary, the provided boxplot analysis comparing 'aroma', 'flavor', and 'acidity' attributes across Good and Poor quality classes of coffee indicates distinct differences. Good quality coffee generally exhibits higher median scores in these attributes, with a tighter spread and fewer outliers, suggesting greater consistency. However, outliers are present in both categories, emphasizing the complexity of coffee grading, where exceptional cases exist, potentially influenced by factors beyond those represented in the analysis. This underscores the necessity of considering multiple sensory attributes in assessing coffee quality, recognizing the nuanced nature of outliers in the evaluation process.
 
+Plotting boxplots of Category_two_defects and Altitude_mean_meters.
 ```{r}
+# Create a boxplot of 'altitude_mean_meters' by 'Qualityclass' without a legend
 ggplot(data = data15, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "altitude_mean_meters")+ 
@@ -98,22 +119,69 @@ ggplot(data = data15, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qu
 ```
 
 ```{r}
+# Create a boxplot of 'category_two_defects' by 'Qualityclass' without a legend
 ggplot(data = data15, aes(x = Qualityclass, y = category_two_defects , fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "category_two_defects")+ 
   theme(legend.position = "none")
 ```
 
+To explore potential correlations between coffee quality and the year of harvest, we create a bar chart representing the distribution of good and poor coffees across various harvest years, treating the year of harvest as a categorical variable.
+
 ```{r}
+# Create a bar plot of the count of 'harvested' by 'Qualityclass'
 ggplot(data15,aes(x=harvested,group=Qualityclass,fill=Qualityclass))+geom_bar()
 ```
 
+The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
+
 ```{r}
-ggplot(data15,aes(x=country_of_origin,group=Qualityclass,fill=Qualityclass))+geom_bar()
+# Create a bar plot of the count of 'country_of_origin' by 'Qualityclass' with rotated x-axis labels
+ggplot(data15, aes(x = country_of_origin, group = Qualityclass, fill = Qualityclass)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
+
+The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
+
 ```{r}
-data15<-data15%>%
-  dplyr::select(-country_of_origin,-harvested)
-columns_to_show <- c(1, 2, 3,4,5)
-ggpairs(data15,columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
+#Create a correlation matrix
+numeric_vars <- data15[,2:6]
+cor_matrix <- cor(numeric_vars)
+print(cor_matrix)
+
+cor_melt <- reshape2::melt(cor_matrix)
+#Create a correlation matrix heatmap
+ggplot(data = cor_melt, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Pearson\nCorrelation") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(x='', y='', title='Correlation Matrix of Coffee Data Variables')
 ```
+
+The sensory characteristics of coffee---aroma, flavor, and acidity---are closely linked to each other and are central to determining coffee quality. The altitude at which coffee is grown may have a minor impact on its aroma and flavor, although the relationship is not strong. The presence of defects has a minimal negative effect on sensory quality, pointing to other factors being more influential in determining the overall quality of coffee.
+
+
+```{r}
+# Removing 'country_of_origin' and 'harvested' columns from the dataset
+# This is because 'country_of_origin' and 'harvested' might be categorical with many levels,
+# which can make visualization cluttered or less informative.
+data15 <- data15 %>%
+  dplyr::select(-country_of_origin, -harvested)
+
+# Define which columns to include in the pair plot
+# Here, we're selecting columns 1 through 5 which presumably are the first five variables
+# of the data15 dataset after removing 'country_of_origin' and 'harvested'.
+columns_to_show <- c(1, 2, 3, 4, 5)
+
+# Create a pairs plot using the ggpairs function from the GGally package.
+# This function creates a matrix of plots with each variable plotted against each other variable.
+# The plots on the diagonal can be histograms or density plots showing the distribution of a single variable,
+# while the off-diagonal plots can be scatter plots or boxplots showing the relationships between two variables.
+# The 'mapping' argument specifies how to color the points, in this case by the 'Qualityclass' variable.
+ggpairs(data15, columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
+```
+The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee. 
