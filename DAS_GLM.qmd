@@ -137,6 +137,24 @@ model_harvested %>%
 
 Here we will try a GLM with all of the available variables
 
+$$p=Prob(\text{Qualityclass="Good"})\\
+ln(\frac{p}{1-p})=\alpha+\beta_1 \cdot(\text{aroma})
++\beta_2\cdot(\text{flavor})
++\beta_3\cdot(\text{category-two-defects})\\
++\beta_4\cdot(\text{altitude_mean_meters})
++\beta_5\cdot(\text{acidity})\\
++\sum\gamma_i\cdot(\text{country_of_origin})+\sum\delta_j\cdot(\text{harvested})$$
+
+• $\alpha$ is the intercept of the model, representing the expected value when all predictors are zero.
+
+• $\beta_1,\ldots,\beta_5$ are different coefficients, which indicate the impacts of these features on the log-odds of coffee quality.
+
+• $\gamma_i$ is the coefficient of specific country.
+
+• country_of_origin indicates the dummy variables of each country of "country_of_origin".
+
+• $\delta_j$ is the coefficient of specific harvest year.
+
 ```{r}
 
 model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor + category_two_defects + altitude_mean_meters + acidity + harvested , data = clean_data,family = binomial(link = "logit"))
