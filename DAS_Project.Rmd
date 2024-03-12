@@ -25,8 +25,11 @@ library(jtools)
 Here we will do some data tidying to take care of NA values
 
 ```{r}
+# Read data from "dataset15.csv" file and store it in the data15 variable
 data = read.csv("dataset15.csv")
+# Remove rows with missing values
 clean_data <- na.omit(data)
+#the first 6 rows of clean_data
 head(clean_data)
 ```
 
