@@ -19,6 +19,8 @@ library(stats)
 library(jtools)
 library(gridExtra)
 library(skimr)
+library(gt)
+library(GGally)
 ```
 
 ### Data Tidying
