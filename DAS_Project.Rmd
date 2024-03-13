@@ -30,6 +30,9 @@ data = read.csv("dataset15.csv")
 # Remove rows with missing values
 clean_data <- na.omit(data)
 #the first 6 rows of clean_data
+data = read.csv("dataset15.csv")
+clean_data <- na.omit(data)
+
 head(clean_data)
 ```
 
