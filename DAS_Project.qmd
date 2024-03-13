@@ -1,27 +1,39 @@
 ---
-title: "DAS_Group15"
+title: "DAS_Project"
 format: html
 editor: visual
-html_document: default
 ---
 
-## Exploratory Analysis
+## DAS Group 15
+
+
+### Libraries
+
+Libraries to be used during project
 
 ```{r}
-library(skimr)
-library(magrittr)
-library(gt)
-library(ggplot2)
-library(tidyr)
-library(dplyr)
-library(GGally)
+library(tidyverse) 
+library(moderndive) 
+library(gapminder) 
+library(sjPlot) 
+library(stats) 
+library(jtools)
+library(gridExtra)
 ```
+
+### Data Tidying
+
+Here we will do some data tidying to take care of NA values
 
 ```{r}
 # Read data from "dataset15.csv" file and store it in the data15 variable
-data15<-read.csv("dataset15.csv") %>%
-  # Remove rows with missing values
-  na.omit()
+data = read.csv("dataset15.csv")
+# Remove rows with missing values
+clean_data <- na.omit(data)
+#the first 6 rows of clean_data
+data = read.csv("dataset15.csv")
+clean_data <- na.omit(data)
+
 # Summarize data15 and store it in the skim variable
 skim<-data15%>%
   skim()
@@ -187,3 +199,4 @@ columns_to_show <- c(1, 2, 3, 4, 5)
 ggpairs(data15, columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
 ```
 The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee. 
+
