@@ -1,7 +1,19 @@
 ---
 title: "DAS_Project"
-format: html
-editor: visual
+author: Group15
+number-sections: true
+format: 
+  html:
+    embed-resources: true
+    code-tools: true
+  pdf: default
+editor_options: 
+  chunk_output_type: console
+execute:
+  echo: true
+  eval: true
+  warning: false
+  message: false
 ---
 
 ## DAS Group 15
