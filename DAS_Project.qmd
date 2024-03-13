@@ -41,20 +41,17 @@ Here we will do some data tidying to take care of NA values
 
 ```{r}
 # Read data from "dataset15.csv" file and store it in the data15 variable
-data15 = read.csv("dataset15.csv")
+data = read.csv("dataset15.csv")
 # Remove rows with missing values
 clean_data <- na.omit(data)
 #the first 6 rows of clean_data
 data = read.csv("dataset15.csv")
 clean_data <- na.omit(data)
-## Changing categorical variables to factor
-clean_data$Qualityclass <- factor(clean_data$Qualityclass)
-clean_data$harvested <- factor(clean_data$harvested)
 #Convert the data type of the Qualityclass column and the harvested column in clean_data to factor (categorical variable)
 aic_list <- list()
 
-# Summarize data15 and store it in the skim variable
-skim<-data15%>%
+# Summarize clean_data and store it in the skim variable
+skim<-clean_data%>%
   skim()
 # Select data from skim variable, rows 1 to 2, columns 1 to 9, and store it in selected_data variable
 selected_data <- skim[1:2, 1:9]
@@ -76,7 +73,7 @@ Eliminate "0" in aroma, flavor and acidity.
 
 ```{r}
 #Eliminate "0" in aroma, flavor and acidity.
-data15 <- data15 %>% 
+clean_data <- clean_data %>% 
   filter(aroma != 0)%>%
   filter(flavor != 0)%>%
   filter(acidity != 0)
@@ -86,8 +83,8 @@ data15 <- data15 %>%
 According to the figure above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity.
 
 ```{r}
-#Remove entries in 'data15' where 'altitude_mean_meters' is greater than 9000
-data15<-data15 %>%
+#Remove entries in 'clean_data' where 'altitude_mean_meters' is greater than 9000
+clean_data<-clean_data %>%
   filter(altitude_mean_meters<= 9000)
 ```
 
@@ -98,7 +95,7 @@ Summary the data again:
 ```{r}
 #tbl3 is the summary of character variable after eliminate unreal value in altitudes and 0 in aroma flavor and acidity
 #Summarize the updated 'data15' using 'skim' and store in 'skim2'
-skim2<-data15%>%
+skim2<-clean_data%>%
   skim()
 selected_data3 <- skim2[1:2, 1:9]
 #Convert 'selected_data3' to a table using 'gt' and store in 'tbl3'
@@ -118,19 +115,19 @@ Doing a boxplot of aroma and quality class for the data set to find the relation
 ```{r}
 #Boxplot
 # Create a boxplot of 'aroma' by 'Qualityclass'
-g1 <- ggplot(data = data15, aes(x = Qualityclass, y = aroma, fill = Qualityclass)) +
+g1 <- ggplot(data = clean_data, aes(x = Qualityclass, y = aroma, fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "aroma") +
   theme(legend.position = "none") +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'flavor' by 'Qualityclass' without a legend
-g2 <- ggplot(data = data15, aes(x = Qualityclass, y = flavor, fill = Qualityclass)) +
+g2 <- ggplot(data = clean_data, aes(x = Qualityclass, y = flavor, fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "flavor") + 
   theme(legend.position = "none") +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'acidity' by 'Qualityclass' without a legend
-g3 <- ggplot(data = data15, aes(x = Qualityclass, y = acidity, fill = Qualityclass)) +
+g3 <- ggplot(data = clean_data, aes(x = Qualityclass, y = acidity, fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "acidity") + 
   theme(legend.position = "none") +
@@ -147,7 +144,7 @@ Plotting boxplots of Category_two_defects and Altitude_mean_meters.
 
 ```{r}
 # Create a boxplot of 'altitude_mean_meters' by 'Qualityclass' without a legend
-ggplot(data = data15, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qualityclass)) +
+ggplot(data = clean_data, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "altitude_mean_meters")+ 
   theme(legend.position = "none")
@@ -155,7 +152,7 @@ ggplot(data = data15, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qu
 
 ```{r}
 # Create a boxplot of 'category_two_defects' by 'Qualityclass' without a legend
-ggplot(data = data15, aes(x = Qualityclass, y = category_two_defects , fill = Qualityclass)) +
+ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects , fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "category_two_defects")+ 
   theme(legend.position = "none")
@@ -165,14 +162,14 @@ To explore potential correlations between coffee quality and the year of harvest
 
 ```{r}
 # Create a bar plot of the count of 'harvested' by 'Qualityclass'
-ggplot(data15,aes(x=harvested,group=Qualityclass,fill=Qualityclass))+geom_bar()
+ggplot(clean_data,aes(x=harvested,group=Qualityclass,fill=Qualityclass))+geom_bar()
 ```
 
 The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
 
 ```{r}
 # Create a bar plot of the count of 'country_of_origin' by 'Qualityclass' with rotated x-axis labels
-ggplot(data15, aes(x = country_of_origin, group = Qualityclass, fill = Qualityclass)) +
+ggplot(clean_data, aes(x = country_of_origin, group = Qualityclass, fill = Qualityclass)) +
   geom_bar() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
@@ -181,7 +178,7 @@ The bar chart suggests a correlation between the year of harvest and the quality
 
 ```{r}
 #Create a correlation matrix
-numeric_vars <- data15[,2:6]
+numeric_vars <- clean_data[,2:6]
 cor_matrix <- cor(numeric_vars)
 print(cor_matrix)
 
@@ -201,11 +198,11 @@ The sensory characteristics of coffee---aroma, flavor, and acidity---are closely
 
 ```{r}
 #Saving a copy
-data <- data15
+data <- clean_data
 # Removing 'country_of_origin' and 'harvested' columns from the dataset
 # This is because 'country_of_origin' and 'harvested' might be categorical with many levels,
 # which can make visualization cluttered or less informative.
-data15 <- data15 %>%
+clean_data1 <- clean_data %>%
   dplyr::select(-country_of_origin, -harvested)
 
 # Define which columns to include in the pair plot
@@ -218,7 +215,7 @@ columns_to_show <- c(1, 2, 3, 4, 5)
 # The plots on the diagonal can be histograms or density plots showing the distribution of a single variable,
 # while the off-diagonal plots can be scatter plots or boxplots showing the relationships between two variables.
 # The 'mapping' argument specifies how to color the points, in this case by the 'Qualityclass' variable.
-ggpairs(data15, columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
+ggpairs(clean_data1, columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
 ```
 
 The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee.
@@ -230,6 +227,11 @@ The scatterplot matrix indicates that higher quality coffee, classified as 'Good
 Here we will try a GLM with the country of origin as the only explanatory variable
 
 ```{r}
+## Changing categorical variables to factor
+clean_data$harvested <- factor(clean_data$harvested)
+clean_data$Qualityclass <- factor(clean_data$Qualityclass,levels = c("Poor","Good"))
+
+
 model_CO <- glm(Qualityclass ~ country_of_origin, data = clean_data,family = binomial(link = "logit"))
 #Create a generalized linear model (glm) using the clean_data dataset, predicting Qualityclass as a function of country_of_origin. It uses the binomial family with a logit link function, and the model is stored in the variable model_CO.
 aic_list$modelCO <- AIC(model_CO)
