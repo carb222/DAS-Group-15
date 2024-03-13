@@ -18,6 +18,7 @@ library(sjPlot)
 library(stats) 
 library(jtools)
 library(gridExtra)
+library(skimr)
 ```
 
 ### Data Tidying
