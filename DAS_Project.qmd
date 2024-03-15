@@ -47,25 +47,37 @@ clean_data <- na.omit(data)
 #the first 6 rows of clean_data
 data = read.csv("dataset15.csv")
 clean_data <- na.omit(data)
-#Convert the data type of the Qualityclass column and the harvested column in clean_data to factor (categorical variable)
+#Convert the data type of the Qualityclass column and the harvested column 
+#in clean_data to factor (categorical variable)
 aic_list <- list()
 
 # Summarize clean_data and store it in the skim variable
 skim<-clean_data%>%
   skim()
-# Select data from skim variable, rows 1 to 2, columns 1 to 9, and store it in selected_data variable
+# Select data from skim variable, rows 1 to 2, columns 1 to 9, and store 
+# it in selected_data variable
 selected_data <- skim[1:2, 1:9]
-# Display selected_data in table format and store it in tbl1 variable
-tbl1<-gt(selected_data)
-tbl1
+
 skim
 ```
 
+tbl2
+
 ```{r}
-#Select rows 3 to 8('aroma' to 'harvested') and columns 2, 10 to 16(mean,sd,percentiles) from 'skim' and store in 'selected_data2'
+#Select rows 3 to 8('aroma' to 'harvested') and columns 2, 10 to 
+#16(mean,sd,percentiles) from 'skim' and store in 'selected_data2'
 selected_data2<-skim[3:8,c(2,10:16)]
 #Convert 'selected_data2' to a table using 'gt' and store in 'tbl2'
-tbl2<-gt(selected_data2)
+tbl2 <- selected_data2 %>%
+  rename( Mean = "numeric.mean",
+             Sd = "numeric.sd",
+              Min = "numeric.p0",
+              Q1 = "numeric.p25",
+              Median = "numeric.p50",
+              Q3 = "numeric.p75",
+              Max = "numeric.p100") %>%
+  gt() %>%
+  fmt_number(decimals = 2)
 tbl2
 ```
 
@@ -83,7 +95,8 @@ clean_data <- clean_data %>%
 According to the figure above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity.
 
 ```{r}
-#Remove entries in 'clean_data' where 'altitude_mean_meters' is greater than 9000
+#Remove entries in 'clean_data' where 'altitude_mean_meters' 
+#is greater than 9000
 clean_data<-clean_data %>%
   filter(altitude_mean_meters<= 9000)
 ```
@@ -93,20 +106,30 @@ clean_data<-clean_data %>%
 Summary the data again:
 
 ```{r}
-#tbl3 is the summary of character variable after eliminate unreal value in altitudes and 0 in aroma flavor and acidity
+#tbl3 is the summary of character variable after eliminate unreal value in 
+#altitudes and 0 in aroma flavor and acidity
 #Summarize the updated 'data15' using 'skim' and store in 'skim2'
 skim2<-clean_data%>%
   skim()
 selected_data3 <- skim2[1:2, 1:9]
-#Convert 'selected_data3' to a table using 'gt' and store in 'tbl3'
-tbl3<-gt(selected_data3)
-tbl3
+
 ```
 
 ```{r}
 #Tbl4 is the numeric variable after doing this change
 selected_data4<-skim2[3:8,c(2,10:16)]
-tbl4<-gt(selected_data4)
+
+
+tbl4 <- selected_data4 %>%
+  rename( Mean = "numeric.mean",
+             Sd = "numeric.sd",
+              Min = "numeric.p0",
+              Q1 = "numeric.p25",
+              Median = "numeric.p50",
+              Q3 = "numeric.p75",
+              Max = "numeric.p100") %>%
+  gt() %>%
+  fmt_number(decimals = 2)
 tbl4
 ```
 
@@ -115,19 +138,22 @@ Doing a boxplot of aroma and quality class for the data set to find the relation
 ```{r}
 #Boxplot
 # Create a boxplot of 'aroma' by 'Qualityclass'
-g1 <- ggplot(data = clean_data, aes(x = Qualityclass, y = aroma, fill = Qualityclass)) +
+g1 <- ggplot(data = clean_data, aes(x = Qualityclass, y = aroma, 
+                                    fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "aroma") +
   theme(legend.position = "none") +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'flavor' by 'Qualityclass' without a legend
-g2 <- ggplot(data = clean_data, aes(x = Qualityclass, y = flavor, fill = Qualityclass)) +
+g2 <- ggplot(data = clean_data, aes(x = Qualityclass, y = flavor, 
+                                    fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "flavor") + 
   theme(legend.position = "none") +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'acidity' by 'Qualityclass' without a legend
-g3 <- ggplot(data = clean_data, aes(x = Qualityclass, y = acidity, fill = Qualityclass)) +
+g3 <- ggplot(data = clean_data, aes(x = Qualityclass, y = acidity, 
+                                    fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "acidity") + 
   theme(legend.position = "none") +
@@ -144,7 +170,8 @@ Plotting boxplots of Category_two_defects and Altitude_mean_meters.
 
 ```{r}
 # Create a boxplot of 'altitude_mean_meters' by 'Qualityclass' without a legend
-ggplot(data = clean_data, aes(x = Qualityclass, y = altitude_mean_meters , fill = Qualityclass)) +
+ggplot(data = clean_data, aes(x = Qualityclass, y = altitude_mean_meters , 
+                              fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "altitude_mean_meters")+ 
   theme(legend.position = "none")
@@ -152,7 +179,8 @@ ggplot(data = clean_data, aes(x = Qualityclass, y = altitude_mean_meters , fill 
 
 ```{r}
 # Create a boxplot of 'category_two_defects' by 'Qualityclass' without a legend
-ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects , fill = Qualityclass)) +
+ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects , 
+                              fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "category_two_defects")+ 
   theme(legend.position = "none")
@@ -162,14 +190,17 @@ To explore potential correlations between coffee quality and the year of harvest
 
 ```{r}
 # Create a bar plot of the count of 'harvested' by 'Qualityclass'
-ggplot(clean_data,aes(x=harvested,group=Qualityclass,fill=Qualityclass))+geom_bar()
+ggplot(clean_data,aes(x=harvested,group=Qualityclass,fill=Qualityclass)) + 
+  geom_bar()
 ```
 
 The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
 
 ```{r}
-# Create a bar plot of the count of 'country_of_origin' by 'Qualityclass' with rotated x-axis labels
-ggplot(clean_data, aes(x = country_of_origin, group = Qualityclass, fill = Qualityclass)) +
+# Create a bar plot of the count of 'country_of_origin' by 'Qualityclass' 
+#with rotated x-axis labels
+ggplot(clean_data, aes(x = country_of_origin, group = Qualityclass, 
+                       fill = Qualityclass)) +
   geom_bar() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
@@ -186,7 +217,7 @@ cor_melt <- reshape2::melt(cor_matrix)
 #Create a correlation matrix heatmap
 ggplot(data = cor_melt, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile() +
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        midpoint = 0, limit = c(-1,1), space = "Lab", 
                        name="Pearson\nCorrelation") +
   theme_minimal() + 
@@ -200,22 +231,28 @@ The sensory characteristics of coffee---aroma, flavor, and acidity---are closely
 #Saving a copy
 data <- clean_data
 # Removing 'country_of_origin' and 'harvested' columns from the dataset
-# This is because 'country_of_origin' and 'harvested' might be categorical with many levels,
-# which can make visualization cluttered or less informative.
+# This is because 'country_of_origin' and 'harvested' might be categorical 
+#with many levels, which can make visualization cluttered or less informative.
 clean_data1 <- clean_data %>%
   dplyr::select(-country_of_origin, -harvested)
 
 # Define which columns to include in the pair plot
-# Here, we're selecting columns 1 through 5 which presumably are the first five variables
-# of the data15 dataset after removing 'country_of_origin' and 'harvested'.
+# Here, we're selecting columns 1 through 5 which presumably are the 
+#first five variables of the data15 dataset after removing 
+#'country_of_origin' and 'harvested'.
 columns_to_show <- c(1, 2, 3, 4, 5)
 
 # Create a pairs plot using the ggpairs function from the GGally package.
-# This function creates a matrix of plots with each variable plotted against each other variable.
-# The plots on the diagonal can be histograms or density plots showing the distribution of a single variable,
-# while the off-diagonal plots can be scatter plots or boxplots showing the relationships between two variables.
-# The 'mapping' argument specifies how to color the points, in this case by the 'Qualityclass' variable.
-ggpairs(clean_data1, columns = columns_to_show, mapping = ggplot2::aes(colour = Qualityclass))
+# This function creates a matrix of plots with each variable plotted 
+#against each other variable.
+# The plots on the diagonal can be histograms or density plots showing 
+#the distribution of a single variable,
+# while the off-diagonal plots can be scatter plots or boxplots showing 
+#the relationships between two variables.
+# The 'mapping' argument specifies how to color the points, in this 
+#case by the 'Qualityclass' variable.
+ggpairs(clean_data1, columns = columns_to_show, 
+        mapping = ggplot2::aes(colour = Qualityclass))
 ```
 
 The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee.
@@ -229,19 +266,21 @@ Here we will try a GLM with the country of origin as the only explanatory variab
 ```{r}
 ## Changing categorical variables to factor
 clean_data$harvested <- factor(clean_data$harvested)
-clean_data$Qualityclass <- factor(clean_data$Qualityclass,levels = c("Poor","Good"))
+clean_data$Qualityclass <- factor(clean_data$Qualityclass,
+                                  levels = c("Poor","Good"))
 
 
-model_CO <- glm(Qualityclass ~ country_of_origin, data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) using the clean_data dataset, predicting Qualityclass as a function of country_of_origin. It uses the binomial family with a logit link function, and the model is stored in the variable model_CO.
+model_CO <- glm(Qualityclass ~ country_of_origin, 
+                data = clean_data,family = binomial(link = "logit"))
+#Create a generalized linear model (glm) using the clean_data dataset, 
+#predicting Qualityclass as a function of country_of_origin. It uses 
+#the binomial family with a logit link function, and the model is 
+#stored in the variable model_CO.
 aic_list$modelCO <- AIC(model_CO)
-#Calculate the Akaike Information Criterion (AIC) value for the above model and add it to the aic_list list under the key model_CO. AIC measures the goodness of fit of the model, taking into account model complexity, with smaller values indicating a better model.
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_CO %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the above model 
+#and add it to the aic_list list under the key model_CO. AIC measures the 
+#goodness of fit of the model, taking into account model complexity, with 
+#smaller values indicating a better model.
 ```
 
 #### GLM - Aroma
@@ -249,16 +288,15 @@ model_CO %>%
 Here we will try a GLM with the Aroma as the only explanatory variable
 
 ```{r}
-model_aroma <- glm(Qualityclass ~ aroma, data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of aroma. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_aroma.
+model_aroma <- glm(Qualityclass ~ aroma, data = clean_data,
+                   family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a 
+#function of aroma. This model uses the cleaned dataset (clean_data) 
+#and assumes the response variable follows a binomial distribution with 
+#a logit link function. The model is stored in the variable model_aroma.
 aic_list$modelaroma <- AIC(model_aroma)
-#Calculate the Akaike Information Criterion (AIC) value for the model_aroma and store this value in the aic_list list under the key modelaroma. 
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_aroma %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the model_aroma 
+#and store this value in the aic_list list under the key modelaroma. 
 ```
 
 #### GLM - Flavor
@@ -266,16 +304,15 @@ model_aroma %>%
 Here we will try a GLM with the Flavor as the only explanatory variable
 
 ```{r}
-model_flavor <- glm(Qualityclass ~ flavor, data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of flavor. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_flavor.
+model_flavor <- glm(Qualityclass ~ flavor, data = clean_data,
+                    family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a function 
+#of flavor. This model uses the cleaned dataset (clean_data) and assumes 
+#the response variable follows a binomial distribution with a logit link 
+#function. The model is stored in the variable model_flavor.
 aic_list$model_flavor <- AIC(model_flavor)
-#Calculate the Akaike Information Criterion (AIC) value for the model_flavor and store this value in the aic_list list under the key model_flavor.
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_flavor %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the model_flavor 
+#and store this value in the aic_list list under the key model_flavor.
 ```
 
 #### GLM - Acidity
@@ -283,16 +320,16 @@ model_flavor %>%
 Here we will try a GLM with the country of origin as the only explanatory variable
 
 ```{r}
-model_acidity <- glm(Qualityclass ~ acidity , data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of acidity. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_acidity.
+model_acidity <- glm(Qualityclass ~ acidity , data = clean_data,
+                     family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a 
+#function of acidity. This model uses the cleaned dataset (clean_data) and 
+#assumes the response variable follows a binomial distribution with a logit 
+#link function. The model is stored in the variable model_acidity.
 aic_list$model_acidity <- AIC(model_acidity)
-#Calculate the Akaike Information Criterion (AIC) value for the model_acidity and store this value in the aic_list list under the key model_acidity.
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_acidity %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the 
+#model_acidity and store this value in the aic_list list under 
+#the key model_acidity.
 ```
 
 #### GLM - Two defects
@@ -300,16 +337,15 @@ model_acidity %>%
 Here we will try a GLM with the Two defects category as the only explanatory variable
 
 ```{r}
-model_2_defects <- glm(Qualityclass ~ category_two_defects, data = clean_data, family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of category_two_defects. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_2_defects.
+model_2_defects <- glm(Qualityclass ~ category_two_defects, data = clean_data, 
+                       family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a function
+#of category_two_defects. This model uses the cleaned dataset (clean_data)
+#and assumes the response variable follows a binomial distribution with
+#a logit link function. The model is stored in the variable model_2_defects.
 aic_list$model_2_defects <- AIC(model_2_defects)
-#Calculate the Akaike Information Criterion (AIC) value for the model_2_defects and store this value in the aic_list list under the key model_2_defects.
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_2_defects %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the model_2_defects 
+#and store this value in the aic_list list under the key model_2_defects.
 ```
 
 #### GLM - Altitude
@@ -317,16 +353,15 @@ model_2_defects %>%
 Here we will try a GLM with the Altitude as the only explanatory variable
 
 ```{r}
-model_altitude <- glm(Qualityclass ~ altitude_mean_meters, data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of altitude_mean_meters. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_altitude.
+model_altitude <- glm(Qualityclass ~ altitude_mean_meters, data = clean_data,
+                      family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a function
+#of altitude_mean_meters. This model uses the cleaned dataset (clean_data) and
+#assumes the response variable follows a binomial distribution with a logit link
+#function. The model is stored in the variable model_altitude.
 aic_list$model_altitude <- AIC(model_altitude)
-#Calculate the Akaike Information Criterion (AIC) value for the model_altitude and store this value in the aic_list list under the key model_altitude.
-```
-
-```{r}
-#summary produced from our logistic regression model
-model_altitude %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the model_altitude 
+#and store this value in the aic_list list under the key model_altitude.
 ```
 
 #### GLM - Year Harvested
@@ -335,15 +370,15 @@ Here we will try a GLM with the harvest year category as the only explanatory va
 
 ```{r}
 
-model_harvested <- glm(Qualityclass ~ harvested , data = clean_data,family = binomial(link = "logit"))
-#Create a generalized linear model (glm) to predict Qualityclass as a function of harvested. This model uses the cleaned dataset (clean_data) and assumes the response variable follows a binomial distribution with a logit link function. The model is stored in the variable model_harvested.
+model_harvested <- glm(Qualityclass ~ harvested , data = clean_data,
+                       family = binomial(link = "logit"))
+#Create a generalized linear model (glm) to predict Qualityclass as a function 
+#of harvested. This model uses the cleaned dataset (clean_data) and assumes 
+#the response variable follows a binomial distribution with a logit link 
+#function. The model is stored in the variable model_harvested.
 aic_list$model_harvested <- AIC(model_harvested)
-#Calculate the Akaike Information Criterion (AIC) value for the model_harvested and store this value in the aic_list list under the key model_harvested
-```
-
-```{r}
-model_harvested %>%   
-  summary() 
+#Calculate the Akaike Information Criterion (AIC) value for the model_harvested 
+#and store this value in the aic_list list under the key model_harvested
 ```
 
 #### GLM - Complete Model
@@ -370,10 +405,19 @@ ln(\frac{p}{1-p})=\alpha+\beta_1 \cdot(\text{aroma})
 
 ```{r}
 
-model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor + category_two_defects + altitude_mean_meters + acidity + harvested , data = clean_data,family = binomial(link = "logit"))
-#Creates a generalized linear model (glm) with Qualityclass (quality level) as the dependent variable, and country_of_origin, aroma, flavor, category_two_defects, altitude_mean_meters, acidity, and harvested as independent variables. This model uses the clean_data dataset, assumes the response variable follows a binomial distribution, and uses a logit link function. The model result is stored in the model_full variable.
+model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor + 
+                    category_two_defects + altitude_mean_meters + acidity + 
+                    harvested , data = clean_data,
+                    family = binomial(link = "logit"))
+#Creates a generalized linear model (glm) with Qualityclass (quality level) 
+#as the dependent variable, and country_of_origin, aroma, flavor, 
+#category_two_defects, altitude_mean_meters, acidity, and harvested as 
+#independent variables. This model uses the clean_data dataset, assumes the 
+#response variable follows a binomial distribution, and uses a logit link 
+#function. The model result is stored in the model_full variable.
 aic_list$model_full <- AIC(model_full)
-#Calculate the Akaike Information Criterion (AIC) value for the model_full and store this value in the aic_list list under the key model_full.
+#Calculate the Akaike Information Criterion (AIC) value for the model_full 
+#and store this value in the aic_list list under the key model_full.
 ```
 
 ```{r}
@@ -385,9 +429,15 @@ model_full %>%
 
 ```{r}
 stepwise_model <- step(model_full, direction = "both", trace = 0)
-#Optimize the model_full model using stepwise regression. The `direction = "both"` parameter indicates that variables can be either added to or removed from the model in search of the best model. `trace = 0` means that detailed step information will not be displayed during the process. The optimized model is saved in the variable stepwise_model.
+#Optimize the model_full model using stepwise regression. The `direction = 
+#"both"` parameter indicates that variables can be either added to or removed 
+#from the model in search of the best model. `trace = 0` means that detailed 
+#step information will not be displayed during the process. The optimized 
+#model is saved in the variable stepwise_model.
 aic_list$stepwise_model <- AIC(stepwise_model)
-#Calculate the Akaike Information Criterion (AIC) value for the optimized stepwise regression model (stepwise_model) and add this value to the aic_list list under the key stepwise_model.
+#Calculate the Akaike Information Criterion (AIC) value for the optimized 
+#stepwise regression model (stepwise_model) and add this value to the aic_list 
+#list under the key stepwise_model.
 ```
 
 ```{r}
@@ -402,9 +452,14 @@ Here we compare all the AIC values for the different models.
 
 ```{r}
 aic_df <- data.frame(Model = names(aic_list), AIC = as.numeric(aic_list))
-#Create a data frame aic_df containing two columns: Model and AIC. The Model column is derived from the keys (i.e., the names of the models) of the aic_list, and the AIC column converts the values (i.e., the AIC values of each model) from the aic_list to numeric.
+#Create a data frame aic_df containing two columns: Model and AIC. The Model 
+#column is derived from the keys (i.e., the names of the models) of the 
+#aic_list, and the AIC column converts the values (i.e., the AIC values 
+#of each model) from the aic_list to numeric.
 aic_df <- aic_df[order(aic_df$AIC), ]
-#Sort the aic_df data frame by the AIC values in ascending order. This means the rows at the top will have the lowest AIC values, generally indicating the best model.
+#Sort the aic_df data frame by the AIC values in ascending order. This means 
+#the rows at the top will have the lowest AIC values, generally indicating
+#the best model.
 aic_df
 ```
 
@@ -428,11 +483,20 @@ Clearly by the plot, the two models with best performance according to AIC are t
 ```{r}
 # find out the parameters with 0 in CI
 conf_intervals <- confint(stepwise_model)
-#Calculate the confidence intervals for parameters in the stepwise regression model (stepwise_model). This step helps in assessing the statistical significance of each variable in the model.
+#Calculate the confidence intervals for parameters in the stepwise regression 
+#model (stepwise_model). This step helps in assessing the statistical 
+#significance of each variable in the model.
 na_vars <- names(which(apply(is.na(conf_intervals), 1, any)))
-#Find the names of variables with NA values in the confidence intervals. These NAs may arise when certain statistical tests cannot be performed.
-non_significant_vars_with_na <- c(na_vars, names(which(conf_intervals[, 1] <= 0 & conf_intervals[, 2] >= 0 & !is.na(conf_intervals[, 1]) & !is.na(conf_intervals[, 2]))))
-#Create a vector that includes both variables with NA values in their confidence intervals and variables that are not statistically significant (where the confidence interval spans zero but does not contain NA values).
+#Find the names of variables with NA values in the confidence intervals. 
+#These NAs may arise when certain statistical tests cannot be performed.
+non_significant_vars_with_na <- c(na_vars, 
+                names(which(conf_intervals[, 1] <= 0 & 
+                              conf_intervals[, 2] >= 0 & 
+                              !is.na(conf_intervals[, 1]) & 
+                              !is.na(conf_intervals[, 2]))))
+#Create a vector that includes both variables with NA values in their 
+#confidence intervals and variables that are not statistically significant 
+#(where the confidence interval spans zero but does not contain NA values).
 print(non_significant_vars_with_na)
 
 #find out the parameters p-value>0.05
@@ -441,7 +505,9 @@ alpha<-0.05
 model_summary<-summary(stepwise_model)
 non_significant_vars_1 <- names(which(model_summary$coefficients[, 4] > alpha))
 print(non_significant_vars_1)
-#Extract the summary of the stepwise regression model and identify variables with p-values greater than a significance level (alpha). Then, print these non-significant variable names.
+#Extract the summary of the stepwise regression model and identify variables
+#with p-values greater than a significance level (alpha). Then, print 
+#these non-significant variable names.
 ```
 
 Eliminate the category_two_defect
@@ -450,19 +516,30 @@ Eliminate the category_two_defect
 new_model <- update(stepwise_model, . ~ . - `category_two_defects`)
 summary(new_model)
 aic_list$model_delete_1<- AIC(new_model)
-#Update the stepwise regression model by removing the variable category_two_defects, and then display the summary of this updated model. Calculate the Akaike Information Criterion (AIC) for the updated model and add it to a list (aic_list) under the key model_delete_1.
+#Update the stepwise regression model by removing the variable 
+#category_two_defects, and then display the summary of this updated model.
+#Calculate the Akaike Information Criterion (AIC) for the updated model and
+#add it to a list (aic_list) under the key model_delete_1.
 ```
 
 ```{r}
 new_model_2<- update(stepwise_model, . ~ . - `category_two_defects`-`country_of_origin`)
 summary(new_model_2)
 aic_list$model_delete_2<- AIC(new_model_2)
-#Update the stepwise regression model by removing both the category_two_defects and country_of_origin variables, then display the summary of this newly updated model. Calculate the Akaike Information Criterion (AIC) for this model and add it to a list (aic_list) under the key model_delete_2.
+#Update the stepwise regression model by removing both the category_two_defects
+#and country_of_origin variables, then display the summary of this newly
+#updated model. Calculate the Akaike Information Criterion (AIC) for this model 
+#and add it to a list (aic_list) under the key model_delete_2.
 ```
 
 ```{r}
 aic_df <- data.frame(Model = names(aic_list), AIC = as.numeric(aic_list))
 aic_df <- aic_df[order(aic_df$AIC), ]
 aic_df
-#Convert the aic_list into a data frame with two columns: "Model" containing the names of models and "AIC" containing their respective Akaike Information Criterion values. Then, sort this data frame by the AIC values in ascending order to compare the models based on their AIC, aiming to identify the model with the lowest AIC value, which suggests a better model fit with fewer unnecessary parameters.
+#Convert the aic_list into a data frame with two columns: "Model" containing 
+#the names of models and "AIC" containing their respective Akaike Information
+#Criterion values. Then, sort this data frame by the AIC values in ascending 
+#order to compare the models based on their AIC, aiming to identify the model 
+#with the lowest AIC value, which suggests a better model fit with fewer
+#unnecessary parameters.
 ```
