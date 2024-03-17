@@ -18,6 +18,13 @@ execute:
 
 ## DAS Group 15
 
+## Introduction
+
+Coffee is not only one of the most as a favored beverage but also as a vital component of numerous countries' economies on the worldwide scale. The quality level of coffee surely influences the value of coffee, which in turn affects the livehood of farmers participated in coffee production. This report aims to explore how different coffee characteristics affect the probability of a batch of coffee being classified as good or poor in quality. To be more specific, we are focused on country of origin, aroma, flavor, acidity, category_two_defects, average altitude of the plantation, and year of the beans were harvested (harvested). These features will be used to predict the quality class of the coffee batch, which is based on the overall quality score of the coffee. A score of 82.5 is used as the dividing line between high-quality and low-quality coffee.
+
+By applying a generalized linear model (GLM), we will evaluate the extent to which these characteristics influence coffee quality classification in order to provide practical recommendations to local coffee farmers to help them improve coffee quality and thus increase market competitiveness
+
+
 ### Libraries
 
 Libraries to be used during project
@@ -35,7 +42,7 @@ library(gt)
 library(GGally)
 ```
 
-### Data Tidying
+## Data Tidying
 
 Here we will do some data tidying to take care of NA values
 
@@ -97,7 +104,7 @@ clean_data<-clean_data %>%
   filter(altitude_mean_meters<= 9000)
 ```
 
-### Exploratory Analysis
+## Exploratory Analysis
 
 Summary the data again:
 
@@ -252,6 +259,8 @@ ggpairs(clean_data1, columns = columns_to_show,
 ```
 
 The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee.
+
+## Formal Analysis
 
 ### GLM Selection
 
