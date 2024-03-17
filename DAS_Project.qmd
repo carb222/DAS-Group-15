@@ -1,7 +1,8 @@
 ---
 title: "DAS_Project"
 author: Group15
-number-sections: true
+number-sections: false
+fig_caption: true
 format: 
   html:
     embed-resources: true
