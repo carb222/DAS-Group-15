@@ -576,3 +576,7 @@ aic_df
 #with the lowest AIC value, which suggests a better model fit with fewer
 #unnecessary parameters.
 ```
+
+### Conclusion
+
+The stepwise model was identified as the most effective based on its lowest Akaike Information Criterion (AIC), which points to a better fit with the data while also being more parsimonious due to the removal of two variables. This model simplifies the complexity without compromising the predictive capability. Additionally, the final best fitting model incorporated only those countries whose p-values were less than 0.05, indicating a statistically significant association with coffee quality.
