@@ -477,6 +477,7 @@ stepwise_model %>%
   summary()
 
 ```
+According to the result, with a higher score in aroma, acidity, flavor, significantly, the coffee bean have a  higher probability to be classified in good quality. The influence of amount of category of two defects is similar to those ,though it influence slightly and insignificantly . Meanwhile, countries impact the quality differently, only 5 origin countries influence the quality. With the similar score in aroma, flavor and acidity, coffee bean produced in Columbia and Thailand have a higher probability in good quality than other, and produced in Uganda, India and Mexico have a lower probability be in good quality than other.
 
 ### AIC and Model Selection
 
