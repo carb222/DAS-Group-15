@@ -518,9 +518,10 @@ print(non_significant_vars_1)
 Eliminate the category_two_defect
 
 ```{r}
+aic_list2<-list()
 new_model <- update(stepwise_model, . ~ . - `category_two_defects`)
 summary(new_model)
-aic_list$model_delete_1<- AIC(new_model)
+aic_list2$model_delete_1<- AIC(new_model)
 #Update the stepwise regression model by removing the variable 
 #category_two_defects, and then display the summary of this updated model.
 #Calculate the Akaike Information Criterion (AIC) for the updated model and
@@ -530,7 +531,7 @@ aic_list$model_delete_1<- AIC(new_model)
 ```{r}
 new_model_2<- update(stepwise_model, . ~ . - `category_two_defects`-`country_of_origin`)
 summary(new_model_2)
-aic_list$model_delete_2<- AIC(new_model_2)
+aic_list2$model_delete_2<- AIC(new_model_2)
 #Update the stepwise regression model by removing both the category_two_defects
 #and country_of_origin variables, then display the summary of this newly
 #updated model. Calculate the Akaike Information Criterion (AIC) for this model 
@@ -538,7 +539,7 @@ aic_list$model_delete_2<- AIC(new_model_2)
 ```
 
 ```{r}
-aic_df <- data.frame(Model = names(aic_list), AIC = as.numeric(aic_list))
+aic_df <- data.frame(Model = names(aic_list2), AIC = as.numeric(aic_list2))
 aic_df <- aic_df[order(aic_df$AIC), ]
 aic_df
 #Convert the aic_list into a data frame with two columns: "Model" containing 
