@@ -60,13 +60,11 @@ skim<-clean_data%>%
 # Select data from skim variable, rows 1 to 2, columns 1 to 9, and store 
 # it in selected_data variable
 selected_data <- skim[1:2, 1:9]
-
-skim
 ```
 
-tbl2
-
 ```{r}
+#| label: tbl-origin
+#| tbl-cap: Summary of the original data
 #Select rows 3 to 8('aroma' to 'harvested') and columns 2, 10 to 
 #16(mean,sd,percentiles) from 'skim' and store in 'selected_data2'
 selected_data2<-skim[3:8,c(2,10:16)]
@@ -84,7 +82,7 @@ tbl2 <- selected_data2 %>%
 tbl2
 ```
 
-Eliminate "0" in aroma, flavor and acidity.
+Based on the table above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity . Meanwhile, eliminate "0" in aroma, flavor and acidity.
 
 ```{r}
 #Eliminate "0" in aroma, flavor and acidity.
@@ -95,8 +93,6 @@ clean_data <- clean_data %>%
 
 ```
 
-According to the figure above, eliminates the data with altitude_mean_meters higher than 9000, due to the inauthenticity.
-
 ```{r}
 #Remove entries in 'clean_data' where 'altitude_mean_meters' 
 #is greater than 9000
@@ -106,7 +102,7 @@ clean_data<-clean_data %>%
 
 ## Exploratory Analysis
 
-Summary the data again:
+Summary the tidyed data:
 
 ```{r}
 #tbl3 is the summary of character variable after eliminate unreal value in 
@@ -119,6 +115,8 @@ selected_data3 <- skim2[1:2, 1:9]
 ```
 
 ```{r}
+#| label: tbl-tidy_data
+#| tbl-cap: Summary of the data after tidying
 #Tbl4 is the numeric variable after doing this change
 selected_data4<-skim2[3:8,c(2,10:16)]
 
@@ -140,28 +138,37 @@ Doing a boxplot of aroma and quality class for the data set to find the relation
 
 ```{r}
 #Boxplot
+theme1<-theme(legend.position = "none",axis.text.x = element_text(size = 12),
+  plot.title = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.title.x = element_text(size = 14),
+  axis.title.y = element_text(size = 14))
 # Create a boxplot of 'aroma' by 'Qualityclass'
 g1 <- ggplot(data = clean_data, aes(x = Qualityclass, y = aroma, 
                                     fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "aroma") +
-  theme(legend.position = "none") +
+  theme1 +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'flavor' by 'Qualityclass' without a legend
 g2 <- ggplot(data = clean_data, aes(x = Qualityclass, y = flavor, 
                                     fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "flavor") + 
-  theme(legend.position = "none") +
+  theme1 +
   coord_fixed(ratio = 1) # Ensuring the plot is square
 # Create a boxplot of 'acidity' by 'Qualityclass' without a legend
 g3 <- ggplot(data = clean_data, aes(x = Qualityclass, y = acidity, 
                                     fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "acidity") + 
-  theme(legend.position = "none") +
+  theme1 +
   coord_fixed(ratio = 1) # Ensuring the plot is square
+```
 
+```{r}
+#| label: fig-boxplot1
+#| fig-cap: Relationship between Quaility class of coffee and the score of aroma, flavor, acidity.
 # Arrange the plots in one row with three columns
 g <- grid.arrange(g1, g2, g3, ncol=3)
 ggsave("my_plots.png", g, width = 10, height = 10, units = "cm")
@@ -172,15 +179,24 @@ In summary, the provided boxplot analysis comparing 'aroma', 'flavor', and 'acid
 Plotting boxplots of Category_two_defects and Altitude_mean_meters.
 
 ```{r}
+#| label: fig-boxplot2
+#| fig-cap: Relationship between Quaility class of coffee and mean altitude of the growers farm.
+theme2<-theme(legend.position = "none",axis.text.x = element_text(size = 14),
+  plot.title = element_text(size = 14),
+  axis.text.y = element_text(size = 14),
+  axis.title.x = element_text(size = 16),
+  axis.title.y = element_text(size = 16))
 # Create a boxplot of 'altitude_mean_meters' by 'Qualityclass' without a legend
 ggplot(data = clean_data, aes(x = Qualityclass, y = altitude_mean_meters , 
                               fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "altitude_mean_meters")+ 
-  theme(legend.position = "none")
+  theme2
 ```
 
 ```{r}
+#| label: fig-boxplot3
+#| fig-cap: Relationship between Quaility class of coffee and count of category 2 type defects in the batch of coffee beans tested.
 # Create a boxplot of 'category_two_defects' by 'Qualityclass' without a legend
 ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects , 
                               fill = Qualityclass)) +
@@ -192,14 +208,18 @@ ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects ,
 To explore potential correlations between coffee quality and the year of harvest, we create a bar chart representing the distribution of good and poor coffees across various harvest years, treating the year of harvest as a categorical variable.
 
 ```{r}
+#| label: fig-barplot1
+#| fig-cap: the barplot for the amount for each quality class in different harvested year
 # Create a bar plot of the count of 'harvested' by 'Qualityclass'
 ggplot(clean_data,aes(x=harvested,group=Qualityclass,fill=Qualityclass)) + 
-  geom_bar()
+  geom_bar()+theme2
 ```
 
 The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
 
 ```{r}
+#| label: fig-barplot2
+#| fig-cap: the barplot for the amount for each quality class in different country
 # Create a bar plot of the count of 'country_of_origin' by 'Qualityclass' 
 #with rotated x-axis labels
 ggplot(clean_data, aes(x = country_of_origin, group = Qualityclass, 
@@ -215,8 +235,12 @@ The bar chart suggests a correlation between the year of harvest and the quality
 numeric_vars <- clean_data[,2:6]
 cor_matrix <- cor(numeric_vars)
 print(cor_matrix)
-
 cor_melt <- reshape2::melt(cor_matrix)
+```
+
+```{r}
+#| label: fig-correlation
+#| fig-cap: the heatmap of  continous variable correlation matrix
 #Create a correlation matrix heatmap
 ggplot(data = cor_melt, aes(x=Var1, y=Var2, fill=value)) +
   geom_tile() +
@@ -231,6 +255,8 @@ ggplot(data = cor_melt, aes(x=Var1, y=Var2, fill=value)) +
 The sensory characteristics of coffee---aroma, flavor, and acidity---are closely linked to each other and are central to determining coffee quality. The altitude at which coffee is grown may have a minor impact on its aroma and flavor, although the relationship is not strong. The presence of defects has a minimal negative effect on sensory quality, pointing to other factors being more influential in determining the overall quality of coffee.
 
 ```{r}
+#| label: fig-variable
+#| fig-cap: the scatterplot of continious variables matrix
 #Saving a copy
 data <- clean_data
 # Removing 'country_of_origin' and 'harvested' columns from the dataset
