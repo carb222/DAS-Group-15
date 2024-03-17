@@ -231,8 +231,7 @@ ggplot(clean_data, aes(x = country_of_origin, group = Qualityclass,
   geom_bar() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
-
-The bar chart suggests a correlation between the year of harvest and the quality classification of the coffee batches. The variation in the number of Good versus Poor quality coffee across years could be indicative of factors such as changes in harvesting techniques, environmental conditions, or market demands influencing coffee quality. These trends underline the importance of year-to-year agricultural practices and their impact on the quality of coffee produced. However, further investigation would be required to determine the causality of these observations and to control for the varying number of batches harvested each year.
+This image indicates that coffee produced in certain countries is of higher quality, such as Colombia, Ethiopia, and Kenya.
 
 ```{r}
 #Create a correlation matrix
@@ -579,6 +578,7 @@ plot(residuals(stepwise_model, type = "deviance") ~ fitted(stepwise_model),
 abline(h = 0, col = "red")
 ```
 
+
 ### model fit
 
 ```{r}
@@ -642,26 +642,32 @@ model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor
                   + category_two_defects + altitude_mean_meters 
                   + acidity + harvested , data = training_set,
                   family = binomial(link = "logit"))
-#Creates a generalized linear model (glm) with Qualityclass (quality level) as the dependent variable, and country_of_origin, aroma, flavor, category_two_defects, altitude_mean_meters, acidity, and harvested as independent variables. This model uses the clean_data dataset, assumes the response variable follows a binomial distribution, and uses a logit link function. The model result is stored in the model_full variable.
+#Creates a generalized linear model (glm) with Qualityclass (quality level) as the dependent variable.
+
 aic_list3$model_full <- AIC(model_full)
-#Calculate the Akaike Information Criterion (AIC) value for the model_full and store this value in the aic_list list under the key model_full.
+#Calculate the AIC value for the model_full and store this value in the aic_list
 
 # do the backward stepwise elimination
 stepwise_model1 <- step(model_full, direction = "both", trace = 0)
-#Optimize the model_full model using stepwise regression. The `direction = "both"` parameter indicates that variables can be either added to or removed from the model in search of the best model. `trace = 0` means that detailed step information will not be displayed during the process. The optimized model is saved in the variable stepwise_model.
-aic_list3$stepwise_model <- AIC(stepwise_model1)
-#Calculate the Akaike Information Criterion (AIC) value for the optimized stepwise regression model (stepwise_model) and add this value to the aic_list list under the key stepwise_model.
 
+#Optimize the model_full model using stepwise regression. The `direction = "both"` parameter indicates that variables can be either added to or removed from the model in search of the best model. `trace = 0` means that detailed step information will not be displayed during the process. The optimized model is saved in the variable stepwise_model.
+
+aic_list3$stepwise_model <- AIC(stepwise_model1)
+#Calculate the AIC value for the stepwise_model and add this value to the aic_list list under the key stepwise_model.
+
+# delete insignificant variable in the model
 modeldelete2<-glm(Qualityclass ~ aroma+flavor+acidity, data =training_set, 
                   family = binomial(link = "logit"))
 aic_list3$model_delete_2 <- AIC(modeldelete2)
 
 
+# construct training control for cross-validation
 set.seed(123)
 fitControl <- trainControl(method = "cv", number = 10, 
                            summaryFunction = twoClassSummary,
                            savePredictions = "all", classProbs = TRUE,
                            selectionFunction = "best")
+
 #fit the model
 model <- train(Qualityclass ~ ., 
                data = clean_data, 
@@ -696,26 +702,42 @@ bwplot(results)
 ```
 
 ```{r}
+# Extract predictions from the model
 predictions_full <- model$pred
+
+# compute confusion matrix
 confusion_matrix_full <- confusionMatrix(predictions_full$pred, 
                                          predictions_full$obs)
 print(confusion_matrix_full)
+
+#calculate accuracy
 accuracy_full <- confusion_matrix_full$overall['Accuracy']
 print(accuracy_full)
 ```
 
 ```{r}
+# Extra predcition from the model
 predictions_modelstepwise <- modelstepwise1$pred
+
+# compute confusion matrix
 confusion_matrix_stepwise <- confusionMatrix(predictions_modelstepwise$pred, predictions_modelstepwise$obs)
 print(confusion_matrix_stepwise)
+
+# calculate accuracy
 accuracy_stepwise <- confusion_matrix_stepwise$overall['Accuracy']
+
 print(accuracy_stepwise)
 ```
 
 ```{r}
+# Extra predcition from the model
 predictions_modeldelete2 <- modeldelete2$pred
+
+# compute confusion matrix
 confusion_matrix_delete <- confusionMatrix(predictions_modeldelete2$pred, predictions_modeldelete2$obs)
 print(confusion_matrix_delete)
+
+# calculate accuracy
 accuracy_delete<- confusion_matrix_delete$overall['Accuracy']
 print(accuracy_delete)
 ```
