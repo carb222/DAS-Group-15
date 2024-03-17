@@ -17,16 +17,15 @@ execute:
   message: false
 ---
 
-## DAS Group 15
 
-## Introduction
+# Introduction
 
 Coffee is not only one of the most as a favored beverage but also as a vital component of numerous countries' economies on the worldwide scale. The quality level of coffee surely influences the value of coffee, which in turn affects the livehood of farmers participated in coffee production. This report aims to explore how different coffee characteristics affect the probability of a batch of coffee being classified as good or poor in quality. To be more specific, we are focused on country of origin, aroma, flavor, acidity, category_two_defects, average altitude of the plantation, and year of the beans were harvested (harvested). These features will be used to predict the quality class of the coffee batch, which is based on the overall quality score of the coffee. A score of 82.5 is used as the dividing line between high-quality and low-quality coffee.
 
 By applying a generalized linear model (GLM), we will evaluate the extent to which these characteristics influence coffee quality classification in order to provide practical recommendations to local coffee farmers to help them improve coffee quality and thus increase market competitiveness
 
 
-### Libraries
+## Libraries
 
 Libraries to be used during project
 
@@ -41,9 +40,13 @@ library(gridExtra)
 library(skimr)
 library(gt)
 library(GGally)
+library(car)
+library(caret)
+library(knitr)
+library(pROC)
 ```
 
-## Data Tidying
+# Data Tidying
 
 Here we will do some data tidying to take care of NA values
 
@@ -101,9 +104,9 @@ clean_data<-clean_data %>%
   filter(altitude_mean_meters<= 9000)
 ```
 
-## Exploratory Analysis
+# Exploratory Analysis
 
-Summary the tidyed data:
+Summary the tidy data:
 
 ```{r}
 #tbl3 is the summary of character variable after eliminate unreal value in 
@@ -203,7 +206,7 @@ ggplot(data = clean_data, aes(x = Qualityclass, y = category_two_defects ,
                               fill = Qualityclass)) +
   geom_boxplot() +
   labs(x = "Qualityclass", y = "category_two_defects")+ 
-  theme(legend.position = "none")
+  theme2
 ```
 
 To explore potential correlations between coffee quality and the year of harvest, we create a bar chart representing the distribution of good and poor coffees across various harvest years, treating the year of harvest as a categorical variable.
@@ -249,7 +252,8 @@ ggplot(data = cor_melt, aes(x=Var1, y=Var2, fill=value)) +
                        midpoint = 0, limit = c(-1,1), space = "Lab", 
                        name="Pearson\nCorrelation") +
   theme_minimal() + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, 
+                      size = 12)) +
   labs(x='', y='', title='Correlation Matrix of Coffee Data Variables')
 ```
 
@@ -287,11 +291,11 @@ ggpairs(clean_data1, columns = columns_to_show,
 
 The scatterplot matrix indicates that higher quality coffee, classified as 'Good,' typically exhibits higher grades in aroma and flavor, with a strong positive correlation between these two sensory attributes. Acidity also shows a moderate positive correlation with both aroma and flavor, suggesting it contributes significantly to the perceived quality of coffee.
 
-## Formal Analysis
+# Formal Analysis
 
-### GLM Selection
+## GLM Selection
 
-#### GLM - Country of origin
+### GLM - Country of origin
 
 Here we will try a GLM with the country of origin as the only explanatory variable
 
@@ -315,7 +319,7 @@ aic_list$modelCO <- AIC(model_CO)
 #smaller values indicating a better model.
 ```
 
-#### GLM - Aroma
+### GLM - Aroma
 
 Here we will try a GLM with the Aroma as the only explanatory variable
 
@@ -331,7 +335,7 @@ aic_list$modelaroma <- AIC(model_aroma)
 #and store this value in the aic_list list under the key modelaroma. 
 ```
 
-#### GLM - Flavor
+### GLM - Flavor
 
 Here we will try a GLM with the Flavor as the only explanatory variable
 
@@ -347,7 +351,7 @@ aic_list$model_flavor <- AIC(model_flavor)
 #and store this value in the aic_list list under the key model_flavor.
 ```
 
-#### GLM - Acidity
+### GLM - Acidity
 
 Here we will try a GLM with the country of origin as the only explanatory variable
 
@@ -364,7 +368,7 @@ aic_list$model_acidity <- AIC(model_acidity)
 #the key model_acidity.
 ```
 
-#### GLM - Two defects
+### GLM - Two defects
 
 Here we will try a GLM with the Two defects category as the only explanatory variable
 
@@ -380,7 +384,7 @@ aic_list$model_2_defects <- AIC(model_2_defects)
 #and store this value in the aic_list list under the key model_2_defects.
 ```
 
-#### GLM - Altitude
+### GLM - Altitude
 
 Here we will try a GLM with the Altitude as the only explanatory variable
 
@@ -396,7 +400,7 @@ aic_list$model_altitude <- AIC(model_altitude)
 #and store this value in the aic_list list under the key model_altitude.
 ```
 
-#### GLM - Year Harvested
+### GLM - Year Harvested
 
 Here we will try a GLM with the harvest year category as the only explanatory variable
 
@@ -413,17 +417,17 @@ aic_list$model_harvested <- AIC(model_harvested)
 #and store this value in the aic_list list under the key model_harvested
 ```
 
-#### GLM - Complete Model
+### GLM - Complete Model
 
 Here we will try a GLM with all of the available variables
 
-$$p=Prob(\text{Qualityclass="Good"})\\
-ln(\frac{p}{1-p})=\alpha+\beta_1 \cdot(\text{aroma})
+$$p=Prob(\text{Qualityclass="Good"})$$
+$$ln(\frac{p}{1-p})=\alpha+\beta_1 \cdot(\text{aroma})
 +\beta_2\cdot(\text{flavor})
-+\beta_3\cdot(\text{category-two-defects})\\
-+\beta_4\cdot(\text{altitude_mean_meters})
-+\beta_5\cdot(\text{acidity})\\
-+\sum\gamma_i\cdot(\text{country_of_origin})+\sum\delta_j\cdot(\text{harvested})$$
++\beta_3\cdot(\text{category\_two\_defects})$$
+$$+\beta_4\cdot(\text{altitude\_mean\_meters})
++\beta_5\cdot(\text{acidity})$$
+$$+\sum\gamma_i\cdot(\text{country\_of\_origin})+\sum\delta_j\cdot(\text{harvested})$$
 
 • $\alpha$ is the intercept of the model, representing the expected value when all predictors are zero.
 
@@ -436,7 +440,7 @@ ln(\frac{p}{1-p})=\alpha+\beta_1 \cdot(\text{aroma})
 • $\delta_j$ is the coefficient of specific harvest year.
 
 ```{r}
-
+#| warning : false
 model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor + 
                     category_two_defects + altitude_mean_meters + acidity + 
                     harvested , data = clean_data,
@@ -456,10 +460,33 @@ aic_list$model_full <- AIC(model_full)
 model_full %>%   
   summary() 
 ```
+```{r}
+#| label: tbl-viffull
+#| tbl-cap: vif reslut of full model
+vif_full <- vif(model_full)
+# convert ti data frame
+vif_data <- data.frame(
+  Variable = c("country_of_origin", "aroma", "flavor", "category_two_defects", 
+               "altitude_mean_meters", "acidity", "harvested"),
+  GVIF = c(12.686229, 1.284780, 1.299513, 1.312267, 
+           1.539099, 1.231208, 6.238253),
+  Df = c(34, 1, 1, 1, 1, 1, 8),
+  `adjusted_GVIF` = c(1.038067, 1.133482, 1.139962, 1.145542, 1.240604,
+                      1.109598, 1.121222)
+)
 
-#### GLM - Stepwise Selected Model
+# construt table
+kable(vif_data, digits = 6)
+
+
+```
+
+Based on the table provided, the adjusted GVIF values for categorical variables and the GVIF values for continuous variables are all below 5. This indicates that multicollinearity is not a concern in this model.
+
+### GLM - Stepwise Selected Model
 
 ```{r}
+#| warning: false
 stepwise_model <- step(model_full, direction = "both", trace = 0)
 #Optimize the model_full model using stepwise regression. The `direction = 
 #"both"` parameter indicates that variables can be either added to or removed 
@@ -471,15 +498,26 @@ aic_list$stepwise_model <- AIC(stepwise_model)
 #stepwise regression model (stepwise_model) and add this value to the aic_list 
 #list under the key stepwise_model.
 ```
-
 ```{r}
-stepwise_model %>%
-  summary()
+#| label: tbl-vifstepwise
+#| tbl-cap: vif reslut of stepwise model
+#check whether exist multilinearity in model
+vif<- vif(stepwise_model) 
+# convert to data frame
+vif_df <- data.frame(
+  Variable = c("country_of_origin", "aroma", "flavor", "
+               category_two_defects", "acidity"),
+  GVIF = c(2.038182, 1.202929, 1.235534, 1.253349, 1.204488),
+  Df = c(34, 1, 1, 1, 1),
+  `adjusted_GVIF` = c(1.010526, 1.096781, 1.111546, 1.119531, 1.097492)
+)
 
+# use kable establish table
+kable(vif_df, digits = 6)
 ```
-According to the result, with a higher score in aroma, acidity, flavor, significantly, the coffee bean have a  higher probability to be classified in good quality. The influence of amount of category of two defects is similar to those ,though it influence slightly and insignificantly . Meanwhile, countries impact the quality differently, only 5 origin countries influence the quality. With the similar score in aroma, flavor and acidity, coffee bean produced in Columbia and Thailand have a higher probability in good quality than other, and produced in Uganda, India and Mexico have a lower probability be in good quality than other.
+Based on the table provided, the adjusted GVIF values for categorical variables and the GVIF values for continuous variables are all below 5. This indicates that multicollinearity is not a concern in this model.
 
-### AIC and Model Selection
+## AIC and Model Selection
 
 Here we compare all the AIC values for the different models.
 
@@ -498,6 +536,8 @@ aic_df
 
 ```{r}
 # Create the bar plot
+#| label: fig_aci
+#| tbl-cap: the barplot of the aic result of different model
 barplot(aic_df$AIC, names.arg = aic_df$Model, 
         main = "AIC Comparison of Models",, ylab = "AIC Value",
         col = "skyblue", border = "black",
@@ -514,70 +554,206 @@ abline(h = min(aic_df$AIC), col = "red", lwd = 2, lty = 2)
 Clearly by the plot, the two models with best performance according to AIC are the stepwise model and the model that contain all the variables. In this case, we selected the stepwise model as the best as it contains the lowest AIC and also removes 2 variables, which makes our model simpler. Then consider the CI and p-value of the stepwise model
 
 ```{r}
-# find out the parameters with 0 in CI
-conf_intervals <- confint(stepwise_model)
-#Calculate the confidence intervals for parameters in the stepwise regression 
-#model (stepwise_model). This step helps in assessing the statistical 
-#significance of each variable in the model.
-na_vars <- names(which(apply(is.na(conf_intervals), 1, any)))
-#Find the names of variables with NA values in the confidence intervals. 
-#These NAs may arise when certain statistical tests cannot be performed.
-non_significant_vars_with_na <- c(na_vars, 
-                names(which(conf_intervals[, 1] <= 0 & 
-                              conf_intervals[, 2] >= 0 & 
-                              !is.na(conf_intervals[, 1]) & 
-                              !is.na(conf_intervals[, 2]))))
-#Create a vector that includes both variables with NA values in their 
-#confidence intervals and variables that are not statistically significant 
-#(where the confidence interval spans zero but does not contain NA values).
-print(non_significant_vars_with_na)
-
-#find out the parameters p-value>0.05
-alpha<-0.05
-
-model_summary<-summary(stepwise_model)
-non_significant_vars_1 <- names(which(model_summary$coefficients[, 4] > alpha))
-print(non_significant_vars_1)
-#Extract the summary of the stepwise regression model and identify variables
-#with p-values greater than a significance level (alpha). Then, print 
-#these non-significant variable names.
+stepwise_model %>%
+  summary()
 ```
 
-Eliminate the category_two_defect
+According to the result, with a higher score in aroma, acidity, flavor, significantly, the coffee bean have a  higher probability to be classified in good quality. The influence of amount of category of two defects is similar to those ,though it influence slightly and insignificantly . Meanwhile, countries impact the quality differently, only 5 origin countries influence the quality. With the similar score in aroma, flavor and acidity, coffee bean produced in Columbia and Thailand have a higher probability in good quality than other, and produced in Uganda, India and Mexico have a lower probability be in good quality than other.
+
+
+## model fit and assumption check
+
+Driven by the analysis above we select the model after backward stepwise elimination, now we check the fitting of model and assumption.
+
+### assumption check
+
+Check the relationship between fitted value and residuals.
 
 ```{r}
-aic_list2<-list()
-new_model <- update(stepwise_model, . ~ . - `category_two_defects`)
-summary(new_model)
-aic_list2$model_delete_1<- AIC(new_model)
-#Update the stepwise regression model by removing the variable 
-#category_two_defects, and then display the summary of this updated model.
-#Calculate the Akaike Information Criterion (AIC) for the updated model and
-#add it to a list (aic_list) under the key model_delete_1.
+#| label: fig-assumption
+#| fig-cap: fitted values vs deviance residuals
+
+# plot of redisuals and fitted value
+plot(residuals(stepwise_model, type = "deviance") ~ fitted(stepwise_model), 
+     xlab = "Fitted Values", ylab = "Deviance Residuals")
+abline(h = 0, col = "red")
 ```
+
+### model fit
 
 ```{r}
-new_model_2<- update(stepwise_model, . ~ . - `category_two_defects`-`country_of_origin`)
-summary(new_model_2)
-aic_list2$model_delete_2<- AIC(new_model_2)
-#Update the stepwise regression model by removing both the category_two_defects
-#and country_of_origin variables, then display the summary of this newly
-#updated model. Calculate the Akaike Information Criterion (AIC) for this model 
-#and add it to a list (aic_list) under the key model_delete_2.
+#| label: fig-log
+#| fig-cap: log odds for the model
+plot_model(stepwise_model, show.values = FALSE, transform = NULL,
+           title = "Log-Odds", show.p = FALSE)
 ```
+
+From the log-odds plot above, it is obvious that the CI for some of the countries contains zero, which means it is insignificant in predicting the level of the quality of coffee beans. Meanwhile, some of CI for countries is big which may indicates that the data is insufficient in the category. The origin of coffee is a vital attribute for a coffee. At the same time, we want our model to predict the type of coffee as accurately as possible, so we retain this variable.
 
 ```{r}
-aic_df <- data.frame(Model = names(aic_list2), AIC = as.numeric(aic_list2))
-aic_df <- aic_df[order(aic_df$AIC), ]
-aic_df
-#Convert the aic_list into a data frame with two columns: "Model" containing 
-#the names of models and "AIC" containing their respective Akaike Information
-#Criterion values. Then, sort this data frame by the AIC values in ascending 
-#order to compare the models based on their AIC, aiming to identify the model 
-#with the lowest AIC value, which suggests a better model fit with fewer
-#unnecessary parameters.
+#| label: fig-ROC
+#| fig-cap: the ROC curve for the selected model
+#| message: false
+# ROC curve
+probabilities <- predict(stepwise_model, type = "response")
+roc_curve <- roc(response = clean_data$Qualityclass, predictor = probabilities)
+plot(roc_curve)
 ```
 
-### Conclusion
+According to the plot , the ROC curve is close to the upper left corner, indicating that the model we selected has good classification capabilities.
+
+```{r}
+# calculate the auc value
+auc_value <- auc(roc_curve)
+print(auc_value)
+```
+
+The $AUC$ number of the model is 0.96, which is quite close to 1, indicates a excellent perfomance of distinguish the quality level of coffee.
+
+# Conclusion
 
 The stepwise model was identified as the most effective based on its lowest Akaike Information Criterion (AIC), which points to a better fit with the data while also being more parsimonious due to the removal of two variables. This model simplifies the complexity without compromising the predictive capability. Additionally, the final best fitting model incorporated only those countries whose p-values were less than 0.05, indicating a statistically significant association with coffee quality.
+
+# Further work
+
+-   Using an unseen data set with same variable for the data we used in construct model to test the efficiency of our model
+
+-   try to construct and select model on machine learning algorithm. (below is a draft of how to do it by machine learning)
+
+```{r}
+#split the data set
+set.seed(123)
+partition <- createDataPartition(clean_data$Qualityclass, p = 0.75, 
+                                                        list = FALSE)
+training_set <- data[partition, ]
+testing_set <- data[-partition, ]
+training_set$harvested <- factor(training_set$harvested)
+training_set$Qualityclass <- factor(training_set$Qualityclass,
+                                  levels = c("Poor","Good"))
+testing_set$harvested <- factor(testing_set$harvested)
+testing_set$Qualityclass <- factor(testing_set$Qualityclass,
+                                  levels = c("Poor","Good"))
+
+```
+```{r}
+#| warning: false
+aic_list3 <- list()
+model_full <- glm(Qualityclass ~ country_of_origin + aroma + flavor
+                  + category_two_defects + altitude_mean_meters 
+                  + acidity + harvested , data = training_set,
+                  family = binomial(link = "logit"))
+#Creates a generalized linear model (glm) with Qualityclass (quality level) as the dependent variable, and country_of_origin, aroma, flavor, category_two_defects, altitude_mean_meters, acidity, and harvested as independent variables. This model uses the clean_data dataset, assumes the response variable follows a binomial distribution, and uses a logit link function. The model result is stored in the model_full variable.
+aic_list3$model_full <- AIC(model_full)
+#Calculate the Akaike Information Criterion (AIC) value for the model_full and store this value in the aic_list list under the key model_full.
+
+# do the backward stepwise elimination
+stepwise_model1 <- step(model_full, direction = "both", trace = 0)
+#Optimize the model_full model using stepwise regression. The `direction = "both"` parameter indicates that variables can be either added to or removed from the model in search of the best model. `trace = 0` means that detailed step information will not be displayed during the process. The optimized model is saved in the variable stepwise_model.
+aic_list3$stepwise_model <- AIC(stepwise_model1)
+#Calculate the Akaike Information Criterion (AIC) value for the optimized stepwise regression model (stepwise_model) and add this value to the aic_list list under the key stepwise_model.
+
+modeldelete2<-glm(Qualityclass ~ aroma+flavor+acidity, data =training_set, 
+                  family = binomial(link = "logit"))
+aic_list3$model_delete_2 <- AIC(modeldelete2)
+
+
+set.seed(123)
+fitControl <- trainControl(method = "cv", number = 10, 
+                           summaryFunction = twoClassSummary,
+                           savePredictions = "all", classProbs = TRUE,
+                           selectionFunction = "best")
+#fit the model
+model <- train(Qualityclass ~ ., 
+               data = clean_data, 
+               method = "glm", 
+               family = "binomial",
+               trControl = fitControl)
+
+modelstepwise1<-train(Qualityclass ~ country_of_origin+aroma+flavor+acidity, 
+                     data =clean_data, method = "glm", 
+                     family = "binomial",trControl = fitControl)
+
+
+modeldelete2<-train(Qualityclass ~ aroma+flavor+acidity, data =clean_data, 
+                    method = "glm", family = "binomial",
+                    trControl = fitControl)
+
+aic_df <- data.frame(Model = names(aic_list3), AIC = as.numeric(aic_list3))
+aic_df <- aic_df[order(aic_df$AIC), ]
+aic_df
+
+```
+
+```{r}
+#test the stability
+results <- resamples(list(model_full = model, 
+                          model_stepwise= modelstepwise1, 
+                          model_delete2 = modeldelete2))
+```
+
+```{r}
+bwplot(results)
+```
+
+```{r}
+predictions_full <- model$pred
+confusion_matrix_full <- confusionMatrix(predictions_full$pred, 
+                                         predictions_full$obs)
+print(confusion_matrix_full)
+accuracy_full <- confusion_matrix_full$overall['Accuracy']
+print(accuracy_full)
+```
+
+```{r}
+predictions_modelstepwise <- modelstepwise1$pred
+confusion_matrix_stepwise <- confusionMatrix(predictions_modelstepwise$pred, predictions_modelstepwise$obs)
+print(confusion_matrix_stepwise)
+accuracy_stepwise <- confusion_matrix_stepwise$overall['Accuracy']
+print(accuracy_stepwise)
+```
+
+```{r}
+predictions_modeldelete2 <- modeldelete2$pred
+confusion_matrix_delete <- confusionMatrix(predictions_modeldelete2$pred, predictions_modeldelete2$obs)
+print(confusion_matrix_delete)
+accuracy_delete<- confusion_matrix_delete$overall['Accuracy']
+print(accuracy_delete)
+```
+
+According to the result above, the accuracy for full model, model after backward elimination and model delete the insignificant variable in step wise model is $0.873$, $0.875$, $0.869$ respectively, then testing the accuracy of the model
+
+```{r}
+#testing the efficiency of different model
+predictions_full_test <- predict(model, newdata = testing_set)
+predictions_stepwise_test <- predict(modelstepwise1, newdata = testing_set)
+predictions_delete2_test <- predict(modeldelete2, newdata = testing_set)
+
+# construt confusion matrix
+confusion_matrix_full_test<-confusionMatrix(predictions_full_test,
+                                            testing_set$Qualityclass)
+confusion_matrix_stepwise_test<-confusionMatrix(predictions_stepwise_test,
+                                            testing_set$Qualityclass)
+confusion_matrix_delete_test<-confusionMatrix(predictions_delete2_test,
+                                            testing_set$Qualityclass)
+
+# calculate accuracy
+accuracy_full_test<- confusion_matrix_full_test$overall['Accuracy']
+accuracy_stepwise_test<-confusion_matrix_stepwise_test$overall['Accuracy']
+accuracy_delete_test<-confusion_matrix_delete_test$overall['Accuracy']
+
+```
+
+```{r}
+print(accuracy_full_test)
+```
+
+```{r}
+
+print(accuracy_stepwise_test)
+```
+
+```{r}
+print(accuracy_delete_test)
+```
+
+
